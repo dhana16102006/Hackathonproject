@@ -9,8 +9,8 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       manifest: {
-        name: "My Note App",
-        short_name: "MyNote",
+        name: "Tactyl",
+        
         start_url: "/",
         display: "standalone",
         background_color: "#ffffff",
