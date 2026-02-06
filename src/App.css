@@ -1,18 +1,15 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+   
+  
+  
+  
 }
 * {
   box-sizing: border-box;
   font-family: Arial, sans-serif;
 }
 
-body {
-  margin: 0;
-  background: #f5e6dc;
-}
+
 
 .app {
   min-height: 100vh;
@@ -21,13 +18,13 @@ body {
   padding: 16px;
 }
 
-.phone {
+/* .phone { 
   width: 100%;
   max-width: 100%;
   background: #fff;
   border-radius: 0;
   padding: 16px;
-}
+}*/
 /* ===== LOGIN PAGE ===== */
 .login {
   min-height: 100vh;
@@ -351,4 +348,63 @@ body {
   .streak-number {
     font-size: 11px;
   }
+  
+  .root{
+    display: flex;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+  }
+  
+}
+@media (max-width: 768px) {
+
+  body {
+    padding: 0;
+    margin: 0;
+  }
+
+  .header {
+    flex-direction: row;
+    align-items: flex-start;
+    
+    padding: 10px;
+  }
+
+  .header h2 {
+    font-size: 13px;
+    font-weight: bold;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    margin-top: 20px;
+    
+  }
+   .header p {
+    font-size: 2px;
+
+    margin-top: 5px;
+    
+
+  }
+  .logout-btn{
+    margin-top: 20px;
+  }
+  .avatar{
+    margin-left: 1px;
+    margin-right: 20px;
+  }
+
+  
+
+
+}
+
+
+.phone {
+  
+  padding: 5px 15px;
+  
+  
+  background: #ffffff;
+  overflow-x: hidden;
 }

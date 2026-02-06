@@ -111,6 +111,7 @@ export default function App() {
         </div>
       ) : (
         /* -------- MAIN APP -------- */
+        <div className="app-wrapper">
         <div className="phone">
           {/* HEADER */}
           <div className="header">
@@ -221,6 +222,7 @@ export default function App() {
               </div>
             </div>
           )}
+        </div>
         </div>
       )}
     </div>
