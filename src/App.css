@@ -53,7 +53,7 @@ body {
 
 /* Input wrapper */
 .login input {
-  width: 100%;
+  width: 70%;
   max-width: 320px;
   padding: 14px 16px;
   margin-bottom: 14px;
@@ -317,4 +317,38 @@ body {
   font-size: 12px;
   font-weight: 600;
   color: #ff7a00; /* matches fire theme */
+}
+/* ===== MOBILE OPTIMIZATION ===== */
+@media (max-width: 480px) {
+  .reminder {
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .reminder-text h3 {
+    font-size: 15px;
+  }
+
+  .reminder-text p {
+    font-size: 13px;
+    margin: 6px 0 8px;
+  }
+
+  .reminder-text button {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .fire-box {
+    margin-left: 8px;
+  }
+
+  .f {
+    width: 44px;
+    height: 44px;
+  }
+
+  .streak-number {
+    font-size: 11px;
+  }
 }
