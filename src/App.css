@@ -23,11 +23,69 @@ body {
 
 .phone {
   width: 100%;
-  max-width: 390px;
+  max-width: 100%;
   background: #fff;
-  border-radius: 30px;
-  padding: 20px;
-  position: relative;
+  border-radius: 0;
+  padding: 16px;
+}
+/* ===== LOGIN PAGE ===== */
+.login {
+  min-height: 100vh;
+  width: 100%;
+  background: #f6e9df;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.login h2 {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.login p {
+  margin-bottom: 24px;
+  color: #555;
+  font-size: 14px;
+}
+
+/* Input wrapper */
+.login input {
+  width: 100%;
+  max-width: 320px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  border-radius: 14px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  outline: none;
+}
+
+.login input:focus {
+  border-color: #ff7a00;
+}
+
+/* Login button */
+.login-btn {
+  width: 100%;
+  max-width: 320px;
+  padding: 14px;
+  margin-top: 8px;
+  border-radius: 16px;
+  border: none;
+  background: #7b3f00;
+  color: #fff;
+}
+
+.logout-btn {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: #ff7a00;
+  font-size: 14px;
+  cursor: pointer;
 }
 
 .date {
@@ -206,17 +264,57 @@ body {
 
 .reminder-text h3 {
   margin: 0;
-  font-size: 16px;
+  font-size: 25px;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
 .reminder-text p {
-  margin: 6px 0 10px;
-  font-size: 13px;
+  margin: 20px 0 10px;
+  font-size: 20px;
   color: #555;
+  font-weight: 500;
+  font-family: serif;
 }
 
 .reminder-img {
   width: 60px;
   height: 60px;
-  object-fit: contain;
+  /* object-fit: contain; */
+}
+.f{
+  width: 100px;
+}
+.check-circle {
+  width: 22px;
+  height: 22px;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  color: white;
+}
+
+.check-circle.checked {
+  background: #ff7a00;
+  border-color: #ff7a00;
+}
+
+.routine-item.done {
+  background: #fff7ef;
+  box-shadow: 0 6px 14px rgba(255, 122, 0, 0.25);
+}
+.fire-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.streak-number {
+  margin-top: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ff7a00; /* matches fire theme */
 }
