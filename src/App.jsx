@@ -5,6 +5,34 @@ import { useEffect, useState } from "react";
 
 export default function App() {
   const streakCount = 3;
+  const [installPrompt, setInstallPrompt] = useState(null);
+   useEffect(() => {
+  const handler = (e) => {
+    e.preventDefault();
+    setInstallPrompt(e);
+    console.log("Install prompt ready");
+  };
+
+  window.addEventListener("beforeinstallprompt", handler);
+
+  return () => {
+    window.removeEventListener("beforeinstallprompt", handler);
+  };
+}, []);
+{installPrompt && (
+  <button
+    onClick={() => {
+      installPrompt.prompt();
+      installPrompt.userChoice.then(() => {
+        setInstallPrompt(null);
+      });
+    }}
+  >
+    Install App
+  </button>
+)}
+
+
 
   /* ================= FAKE LOGIN ================= */
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
