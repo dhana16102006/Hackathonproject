@@ -99,7 +99,7 @@ export default function App() {
       {!isLoggedIn ? (
         /* -------- LOGIN PAGE -------- */
         <div className="login">
-          <h2>Welcome 👋</h2>
+          <h2>Welcome</h2>
           <p>Login to continue</p>
 
           <input placeholder="Username" />
@@ -118,7 +118,7 @@ export default function App() {
             <img src={avatar} alt="profile" className="avatar" />
             <div className="header-text">
               <h2>Morning, Buddy</h2>
-              <p className="date">Thursday, 10 March 2025</p>
+              <p className="date">Saturday, 7 Feb 2026</p>
             </div>
 
             {/* LOGOUT BUTTON */}
