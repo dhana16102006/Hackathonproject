@@ -1,44 +1,48 @@
 import "./App.css";
-import avatar from "./assets/ani.png";
-import fireicon from "./assets/fire.png";
 import { useEffect, useState } from "react";
 
+import Toast from "./components/Toast";
+import ConfirmModal from "./components/ConfirmModal";
+import Login from "./components/Login";
+import Header from "./components/Header";
+import Reminder from "./components/Reminder";
+import HabitList from "./components/HabitList";
+import AddHabitModal from "./components/AddHabitModal";
+import InstallPrompt from "./components/InstallPrompt";
+
+/* helper */
+const today = () => new Date().toISOString().split("T")[0];
+const pendingCount = habits.filter(h => !h.done).length;
+
 export default function App() {
-  const streakCount = 3;
-  const [installPrompt, setInstallPrompt] = useState(null);
-   useEffect(() => {
-  const handler = (e) => {
-    e.preventDefault();
-    setInstallPrompt(e);
-    console.log("Install prompt ready");
-  };
+  /* ================= STATE ================= */
+  const [toast, setToast] = useState("");
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [habitToDelete, setHabitToDelete] = useState(null);
+  const [open, setOpen] = useState(false);
 
-  window.addEventListener("beforeinstallprompt", handler);
-
-  return () => {
-    window.removeEventListener("beforeinstallprompt", handler);
-  };
-}, []);
-{installPrompt && (
-  <button
-    onClick={() => {
-      installPrompt.prompt();
-      installPrompt.userChoice.then(() => {
-        setInstallPrompt(null);
-      });
-    }}
-  >
-    Install App
-  </button>
-)}
-
-
-
-  /* ================= FAKE LOGIN ================= */
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    return localStorage.getItem("loggedIn") === "true";
+  const [fireStreak, setFireStreak] = useState(() => {
+    return Number(localStorage.getItem("fireStreak")) || 0;
   });
 
+  const [newHabit, setNewHabit] = useState({
+    title: "",
+    hours: "",
+    minutes: "",
+    targetDays: "",
+    icon: "✅",
+  });
+
+  const [habits, setHabits] = useState(() => {
+    const saved = localStorage.getItem("habits");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    localStorage.getItem("loggedIn") === "true"
+  );
+
+  /* ================= LOGIN ================= */
   const login = () => {
     localStorage.setItem("loggedIn", "true");
     setIsLoggedIn(true);
@@ -49,208 +53,171 @@ export default function App() {
     setIsLoggedIn(false);
   };
 
-  /* ================= HABITS ================= */
-  const [habits, setHabits] = useState(() => {
-    const saved = localStorage.getItem("habits");
-    return saved
-      ? JSON.parse(saved)
-      : [
-          {
-            id: 1,
-            title: "Drink a glass of water",
-            streak: 3,
-            time: "5 min",
-            icon: "🥤",
-            done: false,
-          },
-          {
-            id: 2,
-            title: "Meditate to relax",
-            streak: 6,
-            time: "15 min",
-            icon: "🚲",
-            done: false,
-          },
-          {
-            id: 3,
-            title: "Stretch for 10 minutes",
-            streak: 5,
-            time: "10 min",
-            icon: "🧘",
-            done: false,
-          },
-        ];
-  });
+  /* ================= DAILY RESET ================= */
+  useEffect(() => {
+    const lastOpen = localStorage.getItem("lastOpenDate");
+    const now = today();
 
+    if (lastOpen !== now) {
+      setHabits((prev) =>
+        prev.map((h) => ({
+          ...h,
+          done: false,
+        }))
+      );
+      localStorage.setItem("lastOpenDate", now);
+    }
+  }, []);
+
+  /* ================= FIRE STREAK (ALL COMPLETED) ================= */
+  useEffect(() => {
+    if (!habits.length) return;
+
+    const allDone = habits.every((h) => h.done);
+    if (!allDone) return;
+
+    const todayDate = today();
+    const lastFireDate = localStorage.getItem("lastFireDate");
+
+    if (lastFireDate !== todayDate) {
+      setFireStreak((prev) => {
+        const updated = prev + 1;
+        localStorage.setItem("fireStreak", updated);
+        return updated;
+      });
+
+      localStorage.setItem("lastFireDate", todayDate);
+      setToast("🔥 Amazing! All habits completed today!");
+      setTimeout(() => setToast(""), 2500);
+    }
+  }, [habits]);
+
+  /* ================= COMPLETE HABIT (INDIVIDUAL STREAK) ================= */
   const toggleHabit = (id) => {
-    setHabits(
-      habits.map((h) =>
-        h.id === id ? { ...h, done: !h.done } : h
-      )
+    setHabits((prev) =>
+      prev.map((h) => {
+        if (h.id !== id || h.done) return h;
+
+        const todayDate = today();
+        let newStreak = h.streak || 0;
+
+        if (h.lastCompletedDate) {
+          const diff =
+            (new Date(todayDate) - new Date(h.lastCompletedDate)) /
+            (1000 * 60 * 60 * 24);
+
+          newStreak = diff <= 2 ? newStreak + 1 : 1;
+        } else {
+          newStreak = 1;
+        }
+
+        return {
+          ...h,
+          streak: newStreak,
+          lastCompletedDate: todayDate,
+          done: true,
+        };
+      })
     );
   };
 
-  useEffect(() => {
-    localStorage.setItem("habits", JSON.stringify(habits));
-  }, [habits]);
+  /* ================= DELETE HABIT ================= */
+  const askDeleteHabit = (id) => {
+    const habit = habits.find((h) => h.id === id);
+    if (!habit) return;
+    setHabitToDelete(habit);
+    setConfirmOpen(true);
+  };
+
+  const confirmDeleteHabit = () => {
+    setHabits(habits.filter((h) => h.id !== habitToDelete.id));
+    setToast(`🛑 Stopped "${habitToDelete.title}"`);
+    setConfirmOpen(false);
+    setHabitToDelete(null);
+    setTimeout(() => setToast(""), 2500);
+  };
 
   /* ================= ADD HABIT ================= */
-  const [open, setOpen] = useState(false);
-  const [newHabit, setNewHabit] = useState({
-    title: "",
-    time: "",
-    icon: "✅",
-  });
-
   const addHabit = () => {
-    if (!newHabit.title || !newHabit.time) return;
+    if (!newHabit.title.trim()) return;
 
-    setHabits([
-      ...habits,
+    setHabits((prev) => [
+      ...prev,
       {
         id: Date.now(),
         title: newHabit.title,
-        time: newHabit.time + " min",
-        streak: 0,
+        duration: {
+          hours: Number(newHabit.hours) || 0,
+          minutes: Number(newHabit.minutes) || 0,
+        },
+        targetDays: newHabit.targetDays || null,
         icon: newHabit.icon,
+        streak: 0,
+        lastCompletedDate: null,
         done: false,
       },
     ]);
 
-    setNewHabit({ title: "", time: "", icon: "✅" });
+    setNewHabit({
+      title: "",
+      hours: "",
+      minutes: "",
+      targetDays: "",
+      icon: "✅",
+    });
+
     setOpen(false);
   };
+
+  /* ================= SAVE ================= */
+  useEffect(() => {
+    localStorage.setItem("habits", JSON.stringify(habits));
+  }, [habits]);
 
   /* ================= UI ================= */
   return (
     <div className="app">
+      <InstallPrompt />
+      <Toast message={toast} />
+
+      <ConfirmModal
+        open={confirmOpen}
+        title="Stop doing this habit?"
+        message={`Stop "${habitToDelete?.title}"?`}
+        onConfirm={confirmDeleteHabit}
+        onCancel={() => setConfirmOpen(false)}
+      />
+
       {!isLoggedIn ? (
-        /* -------- LOGIN PAGE -------- */
-        <div className="login">
-          <h2>Welcome</h2>
-          <p>Login to continue</p>
-
-          <input placeholder="Username" />
-          <input type="password" placeholder="Password" />
-
-          <button className="login-btn" onClick={login}>
-            Login
-          </button>
-        </div>
+        <Login onLogin={login} />
       ) : (
-        /* -------- MAIN APP -------- */
-        <div className="app-wrapper">
         <div className="phone">
-          {/* HEADER */}
-          <div className="header">
-            <img src={avatar} alt="profile" className="avatar" />
-            <div className="header-text">
-              <h2>Morning, Buddy</h2>
-              <p className="date">Saturday, 7 Feb 2026</p>
-            </div>
+          <Header onLogout={logout} />
 
-            {/* LOGOUT BUTTON */}
-            <button className="logout-btn" onClick={logout}>
-              Logout
-            </button>
-          </div>
+          {/* 🔥 FIRE STREAK */}
+                  <Reminder
+          streakCount={fireStreak}
+          pendingCount={pendingCount}
+        />
 
-          {/* REMINDER */}
-          <div className="reminder">
-            <div className="reminder-text">
-              <h3>Your habit didn’t do itself 😅</h3>
-              <p>Never miss your morning routine!</p>
-              <button>Set Now</button>
-            </div>
 
-            <div className="fire-box">
-              <img src={fireicon} alt="fire" className="f" />
-              <span className="streak-number">{streakCount} days</span>
-            </div>
-          </div>
+          <HabitList
+            habits={habits}
+            toggleHabit={toggleHabit}
+            deleteHabit={askDeleteHabit}
+          />
 
-          {/* DAILY ROUTINE */}
-          <div className="routine-header">
-            <h3>Daily routine</h3>
-            <span>See all</span>
-          </div>
-
-          {habits.map((h) => (
-            <div
-              key={h.id}
-              className={`routine-item ${h.done ? "done" : ""}`}
-            >
-              <div className="left">
-                <div
-                  className={`check-circle ${h.done ? "checked" : ""}`}
-                  onClick={() => toggleHabit(h.id)}
-                >
-                  {h.done && "✓"}
-                </div>
-
-                <div className="icon-box">
-                  <span>{h.icon}</span>
-                </div>
-
-                <div className="text">
-                  <p className="title">{h.title}</p>
-                  <p className="streak">Streak {h.streak} days</p>
-                </div>
-              </div>
-
-              <div className="right">
-                <span>⏱</span>
-                <span>{h.time}</span>
-              </div>
-            </div>
-          ))}
-
-          {/* ADD BUTTON */}
           <button className="fab" onClick={() => setOpen(true)}>
             +
           </button>
 
-          {/* ADD HABIT MODAL */}
-          {open && (
-            <div className="modal">
-              <div className="modal-box">
-                <h3>Add habit</h3>
-
-                <input
-                  placeholder="Habit name"
-                  value={newHabit.title}
-                  onChange={(e) =>
-                    setNewHabit({ ...newHabit, title: e.target.value })
-                  }
-                />
-
-                <input
-                  type="number"
-                  placeholder="Time (minutes)"
-                  value={newHabit.time}
-                  onChange={(e) =>
-                    setNewHabit({ ...newHabit, time: e.target.value })
-                  }
-                />
-
-                <input
-                  placeholder="Icon (emoji)"
-                  value={newHabit.icon}
-                  onChange={(e) =>
-                    setNewHabit({ ...newHabit, icon: e.target.value })
-                  }
-                />
-
-                <div className="modal-actions">
-                  <button onClick={() => setOpen(false)}>Cancel</button>
-                  <button className="save" onClick={addHabit}>
-                    Add
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+          <AddHabitModal
+            open={open}
+            newHabit={newHabit}
+            setNewHabit={setNewHabit}
+            addHabit={addHabit}
+            close={() => setOpen(false)}
+          />
         </div>
       )}
     </div>
