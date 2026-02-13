@@ -12,7 +12,6 @@ import InstallPrompt from "./components/InstallPrompt";
 
 /* helper */
 const today = () => new Date().toISOString().split("T")[0];
-const pendingCount = habits.filter(h => !h.done).length;
 
 export default function App() {
   /* ================= STATE ================= */
@@ -37,6 +36,9 @@ export default function App() {
     const saved = localStorage.getItem("habits");
     return saved ? JSON.parse(saved) : [];
   });
+
+  // ✅ FIX: must be INSIDE component (after habits state)
+  const pendingCount = habits.filter(h => !h.done).length;
 
   const [isLoggedIn, setIsLoggedIn] = useState(
     localStorage.getItem("loggedIn") === "true"
@@ -92,7 +94,7 @@ export default function App() {
     }
   }, [habits]);
 
-  /* ================= COMPLETE HABIT (INDIVIDUAL STREAK) ================= */
+  /* ================= COMPLETE HABIT ================= */
   const toggleHabit = (id) => {
     setHabits((prev) =>
       prev.map((h) => {
@@ -195,11 +197,10 @@ export default function App() {
           <Header onLogout={logout} />
 
           {/* 🔥 FIRE STREAK */}
-                  <Reminder
-          streakCount={fireStreak}
-          pendingCount={pendingCount}
-        />
-
+          <Reminder
+            streakCount={fireStreak}
+            pendingCount={pendingCount}
+          />
 
           <HabitList
             habits={habits}
